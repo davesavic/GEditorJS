@@ -1,0 +1,12 @@
+{
+    "items":[
+        {
+            "text":"Unchecked",
+            "checked":false
+        },
+        {
+            "text":"Checked",
+            "checked":true
+        }
+    ]
+}
