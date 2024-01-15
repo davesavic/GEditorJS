@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>converter: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/davesavic/GEditorJS/converter/html.go (87.9%)</option>
+				
+				<option value="file1">github.com/davesavic/GEditorJS/geditorjs.go (80.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package converter
+
+import (
+        "encoding/json"
+        "fmt"
+        "github.com/davesavic/GEditorJS/block"
+        "strings"
+)
+
+type HTMLBlockConverter struct{}
+
+func (h HTMLBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        converter := GetBlockConverter(b.Type)
+        if converter == nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("unsupported block type: %s", b.Type)
+        }</span>
+
+        <span class="cov8" title="1">return converter.Convert(b)</span>
+}
+
+func GetBlockConverter(blockType string) BlockConverter <span class="cov8" title="1">{
+        switch blockType </span>{
+        case "header":<span class="cov8" title="1">
+                return HTMLHeaderBlockConverter{}</span>
+        case "paragraph":<span class="cov8" title="1">
+                return HTMLParagraphBlockConverter{}</span>
+        case "raw":<span class="cov8" title="1">
+                return HTMLRawBlockConverter{}</span>
+        case "checklist":<span class="cov8" title="1">
+                return HTMLChecklistBlockConverter{}</span>
+        case "list":<span class="cov8" title="1">
+                return HTMLListBlockConverter{}</span>
+        case "quote":<span class="cov8" title="1">
+                return HTMLQuoteBlockConverter{}</span>
+        case "table":<span class="cov8" title="1">
+                return HTMLTableBlockConverter{}</span>
+        case "code":<span class="cov8" title="1">
+                return HTMLCodeBlockConverter{}</span>
+        case "delimiter":<span class="cov8" title="1">
+                return HTMLDelimiterBlockConverter{}</span>
+        default:<span class="cov0" title="0">
+                return nil</span>
+        }
+}
+
+type HTMLHeaderBlockConverter struct{}
+
+func (h HTMLHeaderBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        var data block.HeaderData
+        err := json.Unmarshal(b.Data, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return fmt.Sprintf("&lt;h%d&gt;%s&lt;/h%d&gt;", data.Level, data.Text, data.Level), nil</span>
+}
+
+type HTMLParagraphBlockConverter struct{}
+
+func (h HTMLParagraphBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        var data block.ParagraphData
+        err := json.Unmarshal(b.Data, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return fmt.Sprintf("&lt;p&gt;%s&lt;/p&gt;", data.Text), nil</span>
+}
+
+type HTMLRawBlockConverter struct{}
+
+func (h HTMLRawBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        var data block.RawData
+        err := json.Unmarshal(b.Data, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return data.HTML, nil</span>
+}
+
+type HTMLChecklistBlockConverter struct{}
+
+func (h HTMLChecklistBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        var data block.CheckListData
+        err := json.Unmarshal(b.Data, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">var o strings.Builder
+        o.WriteString("&lt;ul&gt;")
+        for _, item := range data.Items </span><span class="cov8" title="1">{
+                o.WriteString(fmt.Sprintf("&lt;li&gt;&lt;input type=\"checkbox\" disabled%s&gt;%s&lt;/li&gt;", func() string </span><span class="cov8" title="1">{
+                        if item.Checked </span><span class="cov8" title="1">{
+                                return " checked"
+                        }</span>
+
+                        <span class="cov8" title="1">return ""</span>
+                }(), item.Text))
+        }
+        <span class="cov8" title="1">o.WriteString("&lt;/ul&gt;")
+
+        return o.String(), nil</span>
+}
+
+type HTMLListBlockConverter struct{}
+
+func (h HTMLListBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        var data block.ListData
+        err := json.Unmarshal(b.Data, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">var o strings.Builder
+        o.WriteString(fmt.Sprintf("&lt;ul style=\"list-style-type: %s\"&gt;", data.Style))
+        for _, item := range data.Items </span><span class="cov8" title="1">{
+                o.WriteString(fmt.Sprintf("&lt;li&gt;%s&lt;/li&gt;", item.Content))
+        }</span>
+        <span class="cov8" title="1">o.WriteString("&lt;/ul&gt;")
+
+        return o.String(), nil</span>
+}
+
+type HTMLQuoteBlockConverter struct{}
+
+func (h HTMLQuoteBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        var data block.QuoteData
+        err := json.Unmarshal(b.Data, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">if data.Alignment == "" </span><span class="cov0" title="0">{
+                data.Alignment = "center"
+        }</span>
+
+        <span class="cov8" title="1">return fmt.Sprintf("&lt;blockquote style=\"text-align: %s\"&gt;&lt;p&gt;%s&lt;/p&gt;&lt;footer&gt;%s&lt;/footer&gt;&lt;/blockquote&gt;", data.Alignment, data.Text, data.Caption), nil</span>
+}
+
+type HTMLTableBlockConverter struct{}
+
+func (h HTMLTableBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        var data block.TableData
+        err := json.Unmarshal(b.Data, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">var o strings.Builder
+        o.WriteString("&lt;table&gt;")
+
+        tbodyOpened := false
+
+        for i, row := range data.Content </span><span class="cov8" title="1">{
+                if i == 0 &amp;&amp; data.WithHeadings </span><span class="cov8" title="1">{
+                        o.WriteString("&lt;thead&gt;")
+                }</span> else<span class="cov8" title="1"> if i == 0 || !tbodyOpened </span><span class="cov8" title="1">{
+                        o.WriteString("&lt;tbody&gt;")
+                        tbodyOpened = true
+                }</span>
+
+                <span class="cov8" title="1">o.WriteString("&lt;tr&gt;")
+                for _, cell := range row </span><span class="cov8" title="1">{
+                        if i == 0 &amp;&amp; data.WithHeadings </span><span class="cov8" title="1">{
+                                o.WriteString(fmt.Sprintf("&lt;th&gt;%s&lt;/th&gt;", cell))
+                        }</span> else<span class="cov8" title="1"> {
+                                o.WriteString(fmt.Sprintf("&lt;td&gt;%s&lt;/td&gt;", cell))
+                        }</span>
+                }
+                <span class="cov8" title="1">o.WriteString("&lt;/tr&gt;")
+
+                if i == 0 &amp;&amp; data.WithHeadings </span><span class="cov8" title="1">{
+                        o.WriteString("&lt;/thead&gt;")
+                }</span>
+        }
+
+        <span class="cov8" title="1">if tbodyOpened </span><span class="cov8" title="1">{
+                o.WriteString("&lt;/tbody&gt;")
+        }</span>
+
+        <span class="cov8" title="1">o.WriteString("&lt;/table&gt;")
+
+        return o.String(), nil</span>
+}
+
+type HTMLCodeBlockConverter struct{}
+
+func (h HTMLCodeBlockConverter) Convert(b block.Block) (string, error) <span class="cov8" title="1">{
+        var data block.CodeData
+        err := json.Unmarshal(b.Data, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">return fmt.Sprintf("&lt;pre&gt;&lt;code&gt;%s&lt;/code&gt;&lt;/pre&gt;", data.Code), nil</span>
+}
+
+type HTMLDelimiterBlockConverter struct{}
+
+func (h HTMLDelimiterBlockConverter) Convert(_ block.Block) (string, error) <span class="cov8" title="1">{
+        return "&lt;hr&gt;", nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package GEditorJS
+
+import (
+        "encoding/json"
+        "github.com/davesavic/GEditorJS/block"
+        "github.com/davesavic/GEditorJS/converter"
+        "strings"
+)
+
+type EditorJSOutput struct {
+        Time    int64         `json:"time"`
+        Blocks  []block.Block `json:"blocks"`
+        Version string        `json:"version"`
+}
+
+type GEditorJS struct {
+        RawContent string
+}
+
+func New() *GEditorJS <span class="cov8" title="1">{
+        return &amp;GEditorJS{}
+}</span>
+
+func (g *GEditorJS) SetRawContent(rawContent string) <span class="cov8" title="1">{
+        g.RawContent = rawContent
+}</span>
+
+func (g *GEditorJS) Parse(converter converter.BlockConverter) (string, error) <span class="cov8" title="1">{
+        if g.RawContent == "" </span><span class="cov0" title="0">{
+                return "", nil
+        }</span>
+
+        <span class="cov8" title="1">var output EditorJSOutput
+        err := json.Unmarshal([]byte(g.RawContent), &amp;output)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov8" title="1">var o strings.Builder
+        for _, b := range output.Blocks </span><span class="cov8" title="1">{
+                convertedBlock, err := converter.Convert(b)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+
+                <span class="cov8" title="1">o.WriteString(convertedBlock + "\n")</span>
+        }
+
+        <span class="cov8" title="1">return o.String(), nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

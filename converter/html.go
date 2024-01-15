@@ -199,6 +199,6 @@ func (h HTMLCodeBlockConverter) Convert(b block.Block) (string, error) {
 
 type HTMLDelimiterBlockConverter struct{}
 
-func (h HTMLDelimiterBlockConverter) Convert(b block.Block) (string, error) {
+func (h HTMLDelimiterBlockConverter) Convert(_ block.Block) (string, error) {
 	return "<hr>", nil
 }

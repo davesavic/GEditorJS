@@ -2,6 +2,7 @@ package converter_test
 
 import (
 	"encoding/json"
+	"github.com/davesavic/GEditorJS"
 	"github.com/davesavic/GEditorJS/block"
 	"github.com/davesavic/GEditorJS/converter"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +20,7 @@ func loadBlockData(path string, blockData any) error {
 	return json.Unmarshal(d, blockData)
 }
 
-func TestHTMLBlockConverter_Convert(t *testing.T) {
+func TestHTMLBlockConverter_Convert_Individual(t *testing.T) {
 	testCases := []struct {
 		name      string
 		blockType string
@@ -75,10 +76,10 @@ func TestHTMLBlockConverter_Convert(t *testing.T) {
 			expected:  `<pre><code>Code</code></pre>`,
 		},
 		{
-			name: "converts table block to html",
+			name:      "converts table block to html",
 			blockType: "table",
-			filePath: "table.json",
-			expected: `<table><thead><tr><th>Header 1</th><th>Header 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr></tbody></table>`,
+			filePath:  "table.json",
+			expected:  `<table><thead><tr><th>Header 1</th><th>Header 2</th></tr></thead><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr></tbody></table>`,
 		},
 	}
 
@@ -97,4 +98,29 @@ func TestHTMLBlockConverter_Convert(t *testing.T) {
 			assert.Equal(t, tc.expected, result, "Conversion result mismatch")
 		})
 	}
+}
+
+func TestHTMLBlockConverter_Convert(t *testing.T) {
+	sb, err := os.ReadFile(filepath.Join("testdata", "supported_blocks.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var output GEditorJS.EditorJSOutput
+	err = json.Unmarshal(sb, &output)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var o string
+	for _, b := range output.Blocks {
+		convertedBlock, err := converter.HTMLBlockConverter{}.Convert(b)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		o += convertedBlock + "\n"
+	}
+
+	assert.NotEmpty(t, o, "Output should not be empty")
 }

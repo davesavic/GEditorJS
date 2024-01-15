@@ -8,7 +8,7 @@ import (
 )
 
 func TestGEditorJS_Parse(t *testing.T) {
-	sb, err := os.ReadFile("testdata/supported_blocks.json")
+	sb, err := os.ReadFile("converter/testdata/supported_blocks.json")
 	if err != nil {
 		t.Fatal(err)
 	}
